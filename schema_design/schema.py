@@ -5,7 +5,6 @@ conn = psycopg2.connect(
     user='mrvanolog',
     host='localhost',
     port=5432,
-    options='-c search_path=content',
 )
 
 cur = conn.cursor()
