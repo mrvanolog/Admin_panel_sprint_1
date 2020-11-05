@@ -2,7 +2,7 @@ import psycopg2
 import yaml
 from pathlib import Path
 
-parent_dir = Path(__file__).parent
+parent_dir = Path(__file__).parents[1]
 path_dsn = parent_dir.joinpath("dsn.yaml")
 
 with path_dsn.open("r") as f:
