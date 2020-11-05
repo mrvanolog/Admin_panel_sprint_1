@@ -2,7 +2,7 @@ import psycopg2
 import yaml
 from pathlib import Path
 
-parent_dir = Path(__file__).parents[1]
+parent_dir = Path(__file__).parent
 path_dsn = parent_dir.joinpath("dsn.yaml")
 
 with path_dsn.open("r") as f:
@@ -13,7 +13,17 @@ sql_schema = """
 -- Создаем отдельную схему для нашего контента, чтобы не перемешалось с сущностями Django
 CREATE SCHEMA IF NOT EXISTS content;
 
--- Убраны актеры, жанры, режиссеры и сценаристы, так как они находятся в отношении m2m с таблицей
+-- Жанры, которые могут быть у кинопроизведений
+CREATE TABLE IF NOT EXISTS content.genre (
+    id uuid PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT,
+    created_at timestamp with time zone,
+    updated_at timestamp with time zone
+);
+
+-- Убраны актеры, жанры, режиссеры и сценаристы,
+-- так как они находятся в отношении m2m с этой таблицей
 CREATE TABLE IF NOT EXISTS content.film_work (
     id uuid PRIMARY KEY,
     title TEXT NOT NULL,
@@ -27,35 +37,8 @@ CREATE TABLE IF NOT EXISTS content.film_work (
     updated_at timestamp with time zone
 );
 
--- Жанры, которые могут быть у кинопроизведений
-CREATE TABLE IF NOT EXISTS content.genre (
-    id uuid PRIMARY KEY,
-    name TEXT NOT NULL,
-    description TEXT,
-    created_at timestamp with time zone,
-    updated_at timestamp with time zone
-);
-
--- Таблица с информацией о сценаристе
-CREATE TABLE IF NOT EXISTS content.writer (
-    id uuid PRIMARY KEY,
-    full_name TEXT NOT NULL,
-    birth_date DATE,
-    created_at timestamp with time zone,
-    updated_at timestamp with time zone
-);
-
--- Таблица с информацией об актере
-CREATE TABLE IF NOT EXISTS content.actor (
-    id uuid PRIMARY KEY,
-    full_name TEXT NOT NULL,
-    birth_date DATE,
-    created_at timestamp with time zone,
-    updated_at timestamp with time zone
-);
-
--- Таблица с информацией о режиссере
-CREATE TABLE IF NOT EXISTS content.director (
+-- Обобщение для актера, режиссера и сценариста
+CREATE TABLE IF NOT EXISTS content.person (
     id uuid PRIMARY KEY,
     full_name TEXT NOT NULL,
     birth_date DATE,
@@ -71,41 +54,23 @@ CREATE TABLE IF NOT EXISTS content.genre_film_work (
     created_at timestamp with time zone
 );
 
--- m2m таблица для связывания кинопроизведений со сценаристом
-CREATE TABLE IF NOT EXISTS content.writer_film_work (
-    id uuid PRIMARY KEY,
-    film_work_id uuid NOT NULL,
-    writer_id uuid NOT NULL,
-    created_at timestamp with time zone
-);
-
--- m2m таблица для связывания кинопроизведений с актером
-CREATE TABLE IF NOT EXISTS content.actor_film_work (
-    id uuid PRIMARY KEY,
-    film_work_id uuid NOT NULL,
-    actor_id uuid NOT NULL,
-    created_at timestamp with time zone
-);
-
--- m2m таблица для связывания кинопроизведений с режиссером
-CREATE TABLE IF NOT EXISTS content.director_film_work (
-    id uuid PRIMARY KEY,
-    film_work_id uuid NOT NULL,
-    director_id uuid NOT NULL,
-    created_at timestamp with time zone
-);
-
 -- Обязательно проверяется уникальность жанра и кинопроизведения, чтобы не появлялось дублей
 CREATE UNIQUE INDEX film_work_genre ON content.genre_film_work (film_work_id, genre_id);
 
--- Обязательно проверяется уникальность кинопроизведения и сценариста, чтобы не появлялось дублей
-CREATE UNIQUE INDEX film_work_writer ON content.writer_film_work (film_work_id, writer_id);
+-- m2m таблица для связывания кинопроизведений с участниками
+CREATE TABLE IF NOT EXISTS content.person_film_work (
+    id uuid PRIMARY KEY,
+    film_work_id uuid NOT NULL,
+    person_id uuid NOT NULL,
+    role TEXT NOT NULL,
+    created_at timestamp with time zone
+);
 
--- Обязательно проверяется уникальность кинопроизведения и акетра, чтобы не появлялось дублей
-CREATE UNIQUE INDEX film_work_actor ON content.actor_film_work (film_work_id, actor_id);
-
--- Обязательно проверяется уникальность кинопроизведения и режиссера, чтобы не появлялось дублей
-CREATE UNIQUE INDEX film_work_director ON content.director_film_work (film_work_id, director_id);
+-- Обязательно проверяется уникальность кинопроизведения,
+-- человека и роли человека, чтобы не появлялось дублей
+-- Один человек может быть сразу в нескольких ролях (например, сценарист и режиссер)
+CREATE UNIQUE INDEX film_work_person_role
+ON content.person_film_work (film_work_id, person_id, role);
 """
 
 with psycopg2.connect(**dsn) as conn, conn.cursor() as cursor:
