@@ -1,13 +1,13 @@
 import psycopg2
+import yaml
+from pathlib import Path
 
-conn = psycopg2.connect(
-    dbname='movies',
-    user='mrvanolog',
-    host='localhost',
-    port=5432,
-)
+parent_dir = Path(__file__).parent
+path_dsn = parent_dir.joinpath("dsn.yaml")
 
-cur = conn.cursor()
+with path_dsn.open("r") as f:
+    data = f.read()
+    dsn = yaml.safe_load(data)
 
 sql_schema = """
 -- Создаем отдельную схему для нашего контента, чтобы не перемешалось с сущностями Django
@@ -108,8 +108,5 @@ CREATE UNIQUE INDEX film_work_actor ON content.actor_film_work (film_work_id, ac
 CREATE UNIQUE INDEX film_work_director ON content.director_film_work (film_work_id, director_id);
 """
 
-cur.execute(sql_schema)
-
-conn.commit()
-cur.close()
-conn.close()
+with psycopg2.connect(**dsn) as conn, conn.cursor() as cursor:
+    cursor.execute(sql_schema)
