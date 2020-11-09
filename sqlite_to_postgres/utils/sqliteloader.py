@@ -112,14 +112,8 @@ class SQLiteLoader():
                 movie_writers.append(writers[writer_id])
                 writers_set.add(writer_id)
 
-        actors = []
         actors_names = []
         if row['actors_ids'] is not None and row['actors_names'] is not None:
-            actors = [
-                {'id': _id, 'name': name}
-                for _id, name in zip(row['actors_ids'].split(','), row['actors_names'].split(','))
-                if name != 'N/A'
-            ]
             actors_names = [x for x in row['actors_names'].split(',') if x != 'N/A']
 
         new_row = {
@@ -135,18 +129,6 @@ class SQLiteLoader():
             "description": row['plot'] if row['plot'] != 'N/A' else None
         }
 
-        new_row = {
-            "id": row["id"],
-            "genre": row["genre"].replace(" ", "").split(","),
-            "writers": movie_writers,
-            "actors": actors,
-            "imdb_rating": float(row["imdb_rating"]) if row["imdb_rating"] != "N/A" else None,
-            "title": row["title"],
-            "director": [
-                x.strip() for x in row["director"].split(",")
-            ] if row["director"] != "N/A" else None,
-            "description": row["plot"] if row["plot"] != "N/A" else None
-        }
         return new_row
 
     def load_movies(self) -> List[dict]:
