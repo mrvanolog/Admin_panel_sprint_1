@@ -106,19 +106,34 @@ class SQLiteLoader():
         """
         movie_writers = []
         writers_set = set()
-        for writer in json.loads(row["writers"]):
-            writer_id = writer["id"]
-            if writers[writer_id]["name"] != "N/A" and writer_id not in writers_set:
+        for writer in json.loads(row['writers']):
+            writer_id = writer['id']
+            if writers[writer_id]['name'] != 'N/A' and writer_id not in writers_set:
                 movie_writers.append(writers[writer_id])
                 writers_set.add(writer_id)
 
         actors = []
-        if row["actors_ids"] is not None and row["actors_names"] is not None:
+        actors_names = []
+        if row['actors_ids'] is not None and row['actors_names'] is not None:
             actors = [
-                {"id": _id, "name": name}
-                for _id, name in zip(row["actors_ids"].split(","), row["actors_names"].split(","))
-                if name != "N/A"
+                {'id': _id, 'name': name}
+                for _id, name in zip(row['actors_ids'].split(','), row['actors_names'].split(','))
+                if name != 'N/A'
             ]
+            actors_names = [x for x in row['actors_names'].split(',') if x != 'N/A']
+
+        new_row = {
+            "id": row['id'],
+            "genre": row['genre'].replace(' ', '').split(','),
+            "actors": actors_names,
+            "writers": [x['name'] for x in movie_writers],
+            "imdb_rating": float(row['imdb_rating']) if row['imdb_rating'] != 'N/A' else None,
+            "title": row['title'],
+            "director": [
+                x.strip() for x in row['director'].split(',')
+            ] if row['director'] != 'N/A' else None,
+            "description": row['plot'] if row['plot'] != 'N/A' else None
+        }
 
         new_row = {
             "id": row["id"],
