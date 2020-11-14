@@ -7,8 +7,6 @@ from model_utils.models import TimeStampedModel
 class Director(TimeStampedModel):
     first_name = models.CharField(_("имя"), max_length=255)
     last_name = models.CharField(_("фамилия"), max_length=255)
-    # movies = models.ManyToManyField("Movie", blank=True)
-    # series = models.ManyToManyField("Series", blank=True)
 
     class Meta:
         verbose_name = _("режиссер")
@@ -21,8 +19,6 @@ class Director(TimeStampedModel):
 class Actor(TimeStampedModel):
     first_name = models.CharField(_("имя"), max_length=255)
     last_name = models.CharField(_("фамилия"), max_length=255)
-    # movies = models.ManyToManyField("Movie", blank=True)
-    # series = models.ManyToManyField("Series", blank=True)
 
     class Meta:
         verbose_name = _("актер")
@@ -35,8 +31,6 @@ class Actor(TimeStampedModel):
 class Writer(TimeStampedModel):
     first_name = models.CharField(_("имя"), max_length=255)
     last_name = models.CharField(_("фамилия"), max_length=255)
-    # movies = models.ManyToManyField("Movie", blank=True)
-    # series = models.ManyToManyField("Series", blank=True)
 
     class Meta:
         verbose_name = _("сценарист")
