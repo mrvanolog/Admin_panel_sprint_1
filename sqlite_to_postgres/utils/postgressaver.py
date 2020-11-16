@@ -11,14 +11,7 @@ class PostgresSaver():
         self.conn = connection
 
         # сеты, чтобы избежать дублирования данных
-        writers_set: Set[str] = set()
-        directors_set: Set[str] = set()
-        actors_set: Set[str] = set()
-        self.person_set = {
-            "writer": writers_set,
-            "director": directors_set,
-            "actor": actors_set
-        }
+        self.person_set: Set[str] = set()
         self.genres_set: Set[str] = set()
 
         # списки, в которых хранятся таблицы для PostgreSQL
@@ -32,7 +25,8 @@ class PostgresSaver():
         self.schema = "content"
 
     def append_film_work(self, row: Dict[str, Any]) -> str:
-
+        """Добавляет одну строку в локальную таблицу film_work и возвращает uuid фильма.
+        """
         film_id = str(uuid4())
         new_row = {
             "id": film_id,
@@ -51,6 +45,8 @@ class PostgresSaver():
         return film_id
 
     def _add_person(self, id_: str, name: str):
+        """Добавляет один ряд в локальную таблицу person.
+        """
         row = {
             "id": id_,
             "full_name": name,
@@ -60,30 +56,19 @@ class PostgresSaver():
         }
         self.person.append(row)
 
-    def append_person(self, person_list: List[str], role: str) -> List[str]:
-        """
-
-        Parameters
-        ----------
-        person_list : List[str]
-            [description]
-        role : str
-            [description]
-
-        Returns
-        -------
-        List[str]
-            [description]
+    def append_person(self, person_list: List[str]) -> List[str]:
+        """Добавляет несколько строк в локальную таблицу person и возвращает uuid всех добавленных
+        людей. Не добавляет строку, если человек уже есть в таблице.
         """
         if person_list is None:
             return []
 
         id_list = []
         for person in person_list:
-            if person not in self.person_set[role]:
+            if person not in self.person_set:
                 id_ = str(uuid4())
                 self._add_person(id_, person)
-                self.person_set[role].add(person)
+                self.person_set.add(person)
             else:
                 for p in self.person:
                     if p["full_name"] == person:
@@ -95,6 +80,8 @@ class PostgresSaver():
         return id_list
 
     def _add_genre(self, id_: str, name: str):
+        """Добавляет один ряд в локальную таблицу genre.
+        """
         row = {
             "id": id_,
             "name": name,
@@ -105,6 +92,9 @@ class PostgresSaver():
         self.genre.append(row)
 
     def append_genre(self, genre_list: List[str]) -> List[str]:
+        """Добавляет несколько строк в локальную таблицу genre и возвращает uuid всех добавленных
+        жанров. Не добавляет строку, если жанр уже есть в таблице.
+        """
         if genre_list is None:
             return []
 
@@ -125,6 +115,8 @@ class PostgresSaver():
         return id_list
 
     def append_person_film_work(self, film_id: str, person_id_list: List[str], role: str):
+        """Добавляет несколько строк в локальную таблицу person_film_work.
+        """
         for person_id in person_id_list:
             id_ = str(uuid4())
             row = {
@@ -137,6 +129,8 @@ class PostgresSaver():
             self.person_film_work.append(row)
 
     def append_genre_film_work(self, film_id: str, genre_id_list: List[str]):
+        """Добавляет несколько строк в локальную таблицу genre_film_work.
+        """
         for genre_id in genre_id_list:
             id_ = str(uuid4())
             row = {
@@ -148,6 +142,8 @@ class PostgresSaver():
             self.genre_film_work.append(row)
 
     def insert_film_work(self):
+        """Вставляет данные из локальной таблицы film_work в PostgreSQL.
+        """
         with self.conn.cursor() as cursor:
             for row in self.film_work:
                 line = tuple(val for val in row.values())
@@ -166,6 +162,8 @@ class PostgresSaver():
                 """, line)
 
     def insert_genre(self):
+        """Вставляет данные из локальной таблицы genre в PostgreSQL.
+        """
         with self.conn.cursor() as cursor:
             for row in self.genre:
                 line = tuple(val for val in row.values())
@@ -180,6 +178,8 @@ class PostgresSaver():
                 """, line)
 
     def insert_person(self):
+        """Вставляет данные из локальной таблицы person в PostgreSQL.
+        """
         with self.conn.cursor() as cursor:
             for row in self.person:
                 line = tuple(val for val in row.values())
@@ -194,6 +194,8 @@ class PostgresSaver():
                 """, line)
 
     def insert_genre_film_work(self):
+        """Вставляет данные из локальной таблицы genre_film_work в PostgreSQL.
+        """
         with self.conn.cursor() as cursor:
             for row in self.genre_film_work:
                 line = tuple(val for val in row.values())
@@ -207,6 +209,8 @@ class PostgresSaver():
                 """, line)
 
     def insert_person_film_work(self):
+        """Вставляет данные из локальной таблицы person_film_work в PostgreSQL.
+        """
         with self.conn.cursor() as cursor:
             for row in self.person_film_work:
                 line = tuple(val for val in row.values())
@@ -222,16 +226,18 @@ class PostgresSaver():
                 """, line)
 
     def save_all_data(self, data: List[dict]):
+        """Основной метод, который обрабатывает данные из MySQL и загружает их в PostgreSQL.
+        """
         for row in data:
             film_id = self.append_film_work(row)
 
-            actor_id_list = self.append_person(row["actors"], "actor")
+            actor_id_list = self.append_person(row["actors"])
             self.append_person_film_work(film_id, actor_id_list, "actor")
 
-            writer_id_list = self.append_person(row["writers"], "writer")
+            writer_id_list = self.append_person(row["writers"])
             self.append_person_film_work(film_id, writer_id_list, "writers")
 
-            director_id_list = self.append_person(row["director"], "director")
+            director_id_list = self.append_person(row["director"])
             self.append_person_film_work(film_id, director_id_list, "director")
 
             genre_id_list = self.append_genre(row["genre"])
