@@ -1,91 +1,50 @@
 from django.contrib import admin
-from .models import Movie, Series, Director, Actor, Writer, Genre
+from .models import FilmWork, Person, Genre
 
 
-@admin.register(Movie)
-class MovieAdmin(admin.ModelAdmin):
+class PersonInLineAdmin(admin.TabularInline):
+    model = FilmWork.persons.through
+
+
+class GenreInLineAdmin(admin.TabularInline):
+    model = FilmWork.genres.through
+
+
+@admin.register(FilmWork)
+class FilmWorkAdmin(admin.ModelAdmin):
     # отображение полей в списке
-    list_display = ("title", "creation_date", "rating")
+    list_display = ("title", "type", "creation_date", "rating")
     # порядок следования полей в форме создания/редактирования
     fields = (
+        "id",
         "title",
+        "type",
         "description",
         "creation_date",
-        "age_restriction",
         "rating",
-        "directors",
-        "actors",
-        "writers",
-        "genres",
+        "certificate",
         "file_path"
     )
 
+    inlines = (PersonInLineAdmin, GenreInLineAdmin)
+
     # поиск по полям
-    search_fields = ('title', 'description', 'id')
+    search_fields = ('title', 'description', 'type', "genres")
 
 
-@admin.register(Series)
-class SeriesAdmin(admin.ModelAdmin):
+@admin.register(Person)
+class PersonAdmin(admin.ModelAdmin):
     # отображение полей в списке
-    list_display = ("title", "creation_date", "rating")
+    list_display = ("full_name", "birth_date")
     # порядок следования полей в форме создания/редактирования
     fields = (
-        "title",
-        "description",
-        "creation_date",
-        "age_restriction",
-        "rating",
-        "directors",
-        "actors",
-        "writers",
-        "genres",
-        "file_path"
+        "id",
+        "full_name",
+        "birth_date"
     )
 
     # поиск по полям
-    search_fields = ('title', 'description', 'id')
-
-
-@admin.register(Director)
-class DirectorAdmin(admin.ModelAdmin):
-    # отображение полей в списке
-    list_display = ("first_name", "last_name")
-    # порядок следования полей в форме создания/редактирования
-    fields = (
-        "first_name",
-        "last_name"
-    )
-
-    # поиск по полям
-    search_fields = ("first_name", "last_name")
-
-
-@admin.register(Actor)
-class ActorAdmin(admin.ModelAdmin):
-    # отображение полей в списке
-    list_display = ("first_name", "last_name")
-    # порядок следования полей в форме создания/редактирования
-    fields = (
-        "first_name",
-        "last_name"
-    )
-
-    # поиск по полям
-    search_fields = ("first_name", "last_name")
-
-
-@admin.register(Writer)
-class WriterAdmin(admin.ModelAdmin):
-    # отображение полей в списке
-    list_display = ("first_name", "last_name")
-    # порядок следования полей в форме создания/редактирования
-    fields = (
-        "first_name",
-        "last_name"
-    )
-
-    # поиск по полям
-    search_fields = ("first_name", "last_name")
+    search_fields = ('full_name', 'birth_date')
 
 
 @admin.register(Genre)
@@ -94,6 +53,7 @@ class GenreAdmin(admin.ModelAdmin):
     list_display = ("name", "description")
     # порядок следования полей в форме создания/редактирования
     fields = (
+        "id",
         "name",
         "description"
     )
