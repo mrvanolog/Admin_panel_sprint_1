@@ -1,7 +1,8 @@
+import yaml
 import psycopg2
 import sqlite3
-from psycopg2.extensions import connection as _connection
 from pathlib import Path
+from psycopg2.extensions import connection as _connection
 
 from utils.sqliteloader import SQLiteLoader
 from utils.postgressaver import PostgresSaver
@@ -17,13 +18,12 @@ def load_from_sqlite(connection: sqlite3.Connection, pg_conn: _connection):
 
 
 if __name__ == "__main__":
+    parent_dir = Path(__file__).parent
+    path_dsn = parent_dir.joinpath("dsn.yaml")
+
+    with path_dsn.open("r") as f:
+        data = f.read()
+        dsl = yaml.safe_load(data)
     sqlite_path = Path(__file__).parent.joinpath("db.sqlite")
-    dsl = {
-        "dbname": "movies",
-        "user": "postgres",
-        "password": 123,
-        "host": "127.0.0.1",
-        "port": 5432,
-    }
     with sqlite3.connect(sqlite_path) as sqlite_conn, psycopg2.connect(**dsl) as pg_conn:
         load_from_sqlite(sqlite_conn, pg_conn)
