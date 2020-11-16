@@ -19,7 +19,7 @@ def load_from_sqlite(connection: sqlite3.Connection, pg_conn: _connection):
 
 if __name__ == "__main__":
     parent_dir = Path(__file__).parent
-    path_dsn = parent_dir.joinpath("dsn.yaml")
+    path_dsn = parent_dir.joinpath("dsl.yaml")
 
     with path_dsn.open("r") as f:
         data = f.read()
