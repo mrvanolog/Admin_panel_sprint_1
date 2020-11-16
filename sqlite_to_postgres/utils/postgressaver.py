@@ -37,8 +37,8 @@ class PostgresSaver():
             "file_path": None,
             "rating": row["imdb_rating"],
             "type": "movie",
-            "created_at": datetime.now().astimezone(),
-            "updated_at": datetime.now().astimezone()
+            "created": datetime.now().astimezone(),
+            "modified": datetime.now().astimezone()
         }
         self.film_work.append(new_row)
 
@@ -51,8 +51,8 @@ class PostgresSaver():
             "id": id_,
             "full_name": name,
             "birth_date": None,
-            "created_at": datetime.now().astimezone(),
-            "updated_at": datetime.now().astimezone()
+            "created": datetime.now().astimezone(),
+            "modified": datetime.now().astimezone()
         }
         self.person.append(row)
 
@@ -86,8 +86,8 @@ class PostgresSaver():
             "id": id_,
             "name": name,
             "description": None,
-            "created_at": datetime.now().astimezone(),
-            "updated_at": datetime.now().astimezone()
+            "created": datetime.now().astimezone(),
+            "modified": datetime.now().astimezone()
         }
         self.genre.append(row)
 
@@ -124,7 +124,7 @@ class PostgresSaver():
                 "film_work_id": film_id,
                 "person_id": person_id,
                 "role": role,
-                "created_at": datetime.now().astimezone()
+                "created": datetime.now().astimezone()
             }
             self.person_film_work.append(row)
 
@@ -137,7 +137,7 @@ class PostgresSaver():
                 "id": id_,
                 "film_work_id": film_id,
                 "genre_id": genre_id,
-                "created_at": datetime.now().astimezone()
+                "created": datetime.now().astimezone()
             }
             self.genre_film_work.append(row)
 
@@ -156,8 +156,8 @@ class PostgresSaver():
                     file_path,
                     rating,
                     type,
-                    created_at,
-                    updated_at
+                    created,
+                    modified
                 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """, line)
 
@@ -172,8 +172,8 @@ class PostgresSaver():
                     id,
                     name,
                     description,
-                    created_at,
-                    updated_at
+                    created,
+                    modified
                 ) VALUES (%s, %s, %s, %s, %s)
                 """, line)
 
@@ -188,8 +188,8 @@ class PostgresSaver():
                     id,
                     full_name,
                     birth_date,
-                    created_at,
-                    updated_at
+                    created,
+                    modified
                 ) VALUES (%s, %s, %s, %s, %s)
                 """, line)
 
@@ -204,7 +204,7 @@ class PostgresSaver():
                     id,
                     film_work_id,
                     genre_id,
-                    created_at
+                    created
                 ) VALUES (%s, %s, %s, %s)
                 """, line)
 
@@ -220,7 +220,7 @@ class PostgresSaver():
                     film_work_id,
                     person_id,
                     role,
-                    created_at
+                    created
                 ) VALUES (%s, %s, %s, %s, %s)
                 ON CONFLICT (film_work_id, person_id, role) DO NOTHING
                 """, line)
