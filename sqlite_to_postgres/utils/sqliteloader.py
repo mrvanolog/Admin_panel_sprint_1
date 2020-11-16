@@ -68,7 +68,7 @@ class SQLiteLoader():
         dict
             Словарь всех сценаристов вида
             {
-                "Writer": {"id": "writer_id", "name": "writer_name"},
+                "Writer": {"writer_id": "id", "writer_name": "name"},
                 ...
             }
         """
@@ -80,7 +80,7 @@ class SQLiteLoader():
 
     def _transform_row(self, row: dict, writers: dict) -> dict:
         """Основная логика преобразования данных из SQLite во внутреннее
-        представление, которое дальше будет уходить в PostgeSQL.
+        представление, которое дальше будет уходить в PostgreSQL.
         Решаемы проблемы:
         1) genre в БД указан в виде строки из одного или нескольких
         жанров, разделённых запятыми -> преобразовываем в список жанров.
