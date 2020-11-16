@@ -19,8 +19,8 @@ if __name__ == "__main__":
         id uuid PRIMARY KEY,
         name TEXT NOT NULL,
         description TEXT,
-        created_at timestamp with time zone,
-        updated_at timestamp with time zone
+        created timestamp with time zone,
+        modified timestamp with time zone
     );
 
     -- Убраны актеры, жанры, режиссеры и сценаристы,
@@ -34,8 +34,8 @@ if __name__ == "__main__":
         file_path TEXT,
         rating FLOAT,
         type TEXT not null,
-        created_at timestamp with time zone,
-        updated_at timestamp with time zone
+        created timestamp with time zone,
+        modified timestamp with time zone
     );
 
     -- Обобщение для актера, режиссера и сценариста
@@ -43,8 +43,8 @@ if __name__ == "__main__":
         id uuid PRIMARY KEY,
         full_name TEXT NOT NULL,
         birth_date DATE,
-        created_at timestamp with time zone,
-        updated_at timestamp with time zone
+        created timestamp with time zone,
+        modified timestamp with time zone
     );
 
     -- m2m таблица для связывания кинопроизведений с жанрами
@@ -52,7 +52,7 @@ if __name__ == "__main__":
         id uuid PRIMARY KEY,
         film_work_id uuid NOT NULL,
         genre_id uuid NOT NULL,
-        created_at timestamp with time zone
+        created timestamp with time zone
     );
 
     -- Обязательно проверяется уникальность жанра и кинопроизведения, чтобы не появлялось дублей
@@ -64,7 +64,7 @@ if __name__ == "__main__":
         film_work_id uuid NOT NULL,
         person_id uuid NOT NULL,
         role TEXT NOT NULL,
-        created_at timestamp with time zone
+        created timestamp with time zone
     );
 
     -- Обязательно проверяется уникальность кинопроизведения,
