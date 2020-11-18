@@ -4,10 +4,12 @@ from .models import FilmWork, Person, Genre
 
 class PersonInLineAdmin(admin.TabularInline):
     model = FilmWork.persons.through
+    extra = 0
 
 
 class GenreInLineAdmin(admin.TabularInline):
     model = FilmWork.genres.through
+    extra = 0
 
 
 @admin.register(FilmWork)
@@ -16,7 +18,6 @@ class FilmWorkAdmin(admin.ModelAdmin):
     list_display = ("title", "type", "creation_date", "rating")
     # порядок следования полей в форме создания/редактирования
     fields = (
-        "id",
         "title",
         "type",
         "description",
@@ -29,7 +30,7 @@ class FilmWorkAdmin(admin.ModelAdmin):
     inlines = (PersonInLineAdmin, GenreInLineAdmin)
 
     # поиск по полям
-    search_fields = ('title', 'description', 'type', "genres")
+    search_fields = ("title", "description", "type", "genres")
 
 
 @admin.register(Person)
@@ -38,13 +39,14 @@ class PersonAdmin(admin.ModelAdmin):
     list_display = ("full_name", "birth_date")
     # порядок следования полей в форме создания/редактирования
     fields = (
-        "id",
         "full_name",
         "birth_date"
     )
 
+    inlines = (PersonInLineAdmin, )
+
     # поиск по полям
-    search_fields = ('full_name', 'birth_date')
+    search_fields = ("full_name", "birth_date")
 
 
 @admin.register(Genre)
@@ -53,10 +55,11 @@ class GenreAdmin(admin.ModelAdmin):
     list_display = ("name", "description")
     # порядок следования полей в форме создания/редактирования
     fields = (
-        "id",
         "name",
         "description"
     )
+
+    inlines = (GenreInLineAdmin, )
 
     # поиск по полям
     search_fields = ("name", "description")
