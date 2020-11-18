@@ -31,9 +31,9 @@ class PostgresSaver():
         new_row = {
             "id": film_id,
             "title": row["title"],
-            "description": row["description"],
+            "description": "" if row["description"] is None else row["description"],
             "creation_date": None,
-            "certificate": None,
+            "certificate": "",
             "file_path": None,
             "rating": row["imdb_rating"],
             "type": "movie",
@@ -85,7 +85,7 @@ class PostgresSaver():
         row = {
             "id": id_,
             "name": name,
-            "description": None,
+            "description": "",
             "created": datetime.now().astimezone(),
             "modified": datetime.now().astimezone()
         }
@@ -235,7 +235,7 @@ class PostgresSaver():
             self.append_person_film_work(film_id, actor_id_list, "actor")
 
             writer_id_list = self.append_person(row["writers"])
-            self.append_person_film_work(film_id, writer_id_list, "writers")
+            self.append_person_film_work(film_id, writer_id_list, "writer")
 
             director_id_list = self.append_person(row["director"])
             self.append_person_film_work(film_id, director_id_list, "director")
